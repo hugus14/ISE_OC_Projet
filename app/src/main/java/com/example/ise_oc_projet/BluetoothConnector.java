@@ -55,9 +55,4 @@ public class BluetoothConnector {
     }
 
 
-    public void activityResultReceived(int resultCode) {
-        if(resultCode == ACTIVITY_RESULT_BT_ENBALE){
-            show_BT_discovery();
-        }
-    }
 }

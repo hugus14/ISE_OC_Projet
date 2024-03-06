@@ -3,10 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.ise_oc_projet">
 
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 
 
     <application
@@ -19,6 +24,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ISE_OC_Projet"
         tools:targetApi="31">
+        <activity
+            android:name=".DeviceListActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

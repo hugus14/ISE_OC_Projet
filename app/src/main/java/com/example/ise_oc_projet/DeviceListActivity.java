@@ -19,9 +19,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.Set;
 
@@ -35,12 +37,19 @@ public class DeviceListActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothManager bluetoothManager;
     private ArrayAdapter<String> mDevicesArrayAdapter;
+    private ListView newDevicesListView;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
+
+        newDevicesListView = (ListView) findViewById(R.id.available_devices);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         init();
     }
 
@@ -49,17 +58,13 @@ public class DeviceListActivity extends AppCompatActivity {
         mDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_item, R.id.device_name);
         Log.println(Log.INFO, "DeviceListActivity", "Show_available_device is starting");
 
-        ListView newDevicesListView = (ListView) findViewById(R.id.available_devices);
         newDevicesListView.setAdapter(mDevicesArrayAdapter);
-        //newDevicesListView.setOnItemClickListener(mDeviceClickListener);
-        mDevicesArrayAdapter.add("TEST 1 ");
+        newDevicesListView.setOnItemClickListener(itemlistener);
 
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mReceiver, filter);
 
         // Start discovery
@@ -71,24 +76,37 @@ public class DeviceListActivity extends AppCompatActivity {
         bluetoothAdapter.startDiscovery();
     }
 
+    private final AdapterView.OnItemClickListener itemlistener = new AdapterView.OnItemClickListener() {
+
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Object o = newDevicesListView.getItemAtPosition(position);
+            String name = (String)o; //As you are using Default String Adapter
+            Log.println(Log.INFO, "DeviceListActivity", "item selected : "+name);
+        }
+    };
+
     // The BroadcastReceiver that listens for discovered devices
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             // When discovery finds a device
-            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                //discovery starts, we can show progress dialog or perform other tasks
-                Log.println(Log.INFO, "DeviceListActivity", "BT Receiver - ACTION_DISCOVERY_STARTED");
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                //discovery finishes, dismis progress dialog
-                Log.println(Log.INFO, "DeviceListActivity", "BT Receiver - ACTION_DISCOVERY_FINISHED");
-            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 Log.println(Log.INFO, "DeviceListActivity", "Device has been find");
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // If it's already paired, skip it, because it's been listed already
                 //if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                mDevicesArrayAdapter.add(device.getName());
+                String deviceName = device.getName();
+                if(deviceName != null){
+                    Log.println(Log.INFO, "DeviceListActivity", "device found : "+deviceName);
+
+                    mDevicesArrayAdapter.add(deviceName);
+                    mDevicesArrayAdapter.notifyDataSetChanged();
+                }else{
+                    Log.println(Log.INFO, "DeviceListActivity", "device found but null, error has been handle correctly");
+
+                }
+
                // }
             }
         }
@@ -155,9 +173,7 @@ public class DeviceListActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == ACTIVITY_RESULT_BT_ENBALE){
-           if(bluetoothAdapter.isEnabled()) {
                show_available_device();
-           }
         }
         else if(resultCode == RSLT_CODE_ACCESS_FINE_LOCATION){
             check_permission_log();

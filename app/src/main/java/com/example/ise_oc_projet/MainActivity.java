@@ -3,36 +3,34 @@ package com.example.ise_oc_projet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.*;
 
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    //*** VARIABLES ***//
+    // WEB
     OkHttpClient client;
     Request request;
-    // Obtenez le timestamp actuel en millisecondes
+
+    // Timestamp
     long timestamp;
     String timestampString;
+
+    // Action
     Button back;
     Button forward;
     Button left;
     Button right;
 
+    // Result
     TextView tb;
 
     @Override
@@ -40,12 +38,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Obtenez le timestamp actuel en millisecondes
+        // To get the timestamp in mS
         timestamp = System.currentTimeMillis() / 1000;
         timestampString = String.valueOf(timestamp);
 
+        // Init Buttons and result
         tb = findViewById(R.id.result);
-
         back = findViewById(R.id.back);
         left = findViewById(R.id.left);
         right = findViewById(R.id.right);
@@ -69,10 +67,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         final String webContent = response.body().string();
                         if(!response.isSuccessful()){
-                            Log.e("test", "Erreur : " + response);
+                            Log.e("Projet gp 56", "Erreur : " + response);
                             throw new IOException("Erreur : " + response);
                         } else {
-                            Log.d("Test", webContent);
+                            Log.d("Projet gp 56", webContent);
                             MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
                         }
                     }
@@ -99,10 +97,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         final String webContent = response.body().string();
                         if(!response.isSuccessful()){
-                            Log.e("test", "Erreur : " + response);
+                            Log.e("Projet gp 56", "Erreur : " + response);
                             throw new IOException("Erreur : " + response);
                         } else {
-                            Log.d("Test", webContent);
+                            Log.d("Projet gp 56", webContent);
                             MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
                         }
                     }
@@ -129,10 +127,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         final String webContent = response.body().string();
                         if(!response.isSuccessful()){
-                            Log.e("test", "Erreur : " + response);
+                            Log.e("Projet gp 56", "Erreur : " + response);
                             throw new IOException("Erreur : " + response);
                         } else {
-                            Log.d("Test", webContent);
+                            Log.d("Projet gp 56", webContent);
                             MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
                         }
                     }
@@ -159,10 +157,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         final String webContent = response.body().string();
                         if(!response.isSuccessful()){
-                            Log.e("test", "Erreur : " + response);
+                            Log.e("Projet gp 56", "Erreur : " + response);
                             throw new IOException("Erreur : " + response);
                         } else {
-                            Log.d("Test", webContent);
+                            Log.d("Projet gp 56", webContent);
                             MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
                         }
                     }

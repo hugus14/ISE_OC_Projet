@@ -3,7 +3,11 @@ package com.example.ise_oc_projet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -38,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SeekBar brightnessSeekBar;
+        CheckBox autoBrightnessCheckBox;
+
         // To get the timestamp in mS
         timestamp = System.currentTimeMillis() / 1000;
         timestampString = String.valueOf(timestamp);
@@ -48,6 +55,37 @@ public class MainActivity extends AppCompatActivity {
         left = findViewById(R.id.left);
         right = findViewById(R.id.right);
         forward = findViewById(R.id.forward);
+
+        checkAndRequestPermissions();
+
+        brightnessSeekBar = findViewById(R.id.brightnessSeekBar);
+        autoBrightnessCheckBox = findViewById(R.id.autoBrightnessCheckBox);
+
+        brightnessSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (!autoBrightnessCheckBox.isChecked()) {
+                    changeScreenBrightness(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        autoBrightnessCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                setAutoBrightness(true);
+            } else {
+                setAutoBrightness(false);
+                changeScreenBrightness(brightnessSeekBar.getProgress());
+            }
+        });
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,7 +207,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
+
+    private void changeScreenBrightness(int brightnessValue) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(getApplicationContext())) {
+                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessValue);
+            } else {
+                // Montrez à l'utilisateur comment activer cette permission
+                Toast.makeText(this, "Please enable write settings for this app", Toast.LENGTH_LONG).show();
+                checkAndRequestPermissions();
+            }
+        } else {
+            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightnessValue);
+        }
+    }
+
+    private void setAutoBrightness(boolean value) {
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, value ? Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC : Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+    }
+
+    private void checkAndRequestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 200);
+            }
+        }
+    }
+
+
+
 }

@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class DeviceListActivity extends AppCompatActivity {
@@ -36,7 +37,11 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothManager bluetoothManager;
-    private ArrayAdapter<String> mDevicesArrayAdapter;
+
+    //private ArrayAdapter<String> mDevicesArrayAdapter;
+    private DeviceListAdaptater device_adaptater;
+
+    private ArrayList<BluetoothDevice> availableBTDevices;
     private ListView newDevicesListView;
 
     @Override
@@ -45,6 +50,7 @@ public class DeviceListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_device_list);
 
         newDevicesListView = (ListView) findViewById(R.id.available_devices);
+        availableBTDevices = new ArrayList<BluetoothDevice>();
     }
 
     @Override
@@ -54,11 +60,11 @@ public class DeviceListActivity extends AppCompatActivity {
     }
 
     private void show_available_device() {
-
-        mDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_item, R.id.device_name);
+        //mDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_item, R.id.device_name);
+        device_adaptater = new DeviceListAdaptater(this);
         Log.println(Log.INFO, "DeviceListActivity", "Show_available_device is starting");
 
-        newDevicesListView.setAdapter(mDevicesArrayAdapter);
+        newDevicesListView.setAdapter(device_adaptater);
         newDevicesListView.setOnItemClickListener(itemlistener);
 
 
@@ -79,9 +85,10 @@ public class DeviceListActivity extends AppCompatActivity {
     private final AdapterView.OnItemClickListener itemlistener = new AdapterView.OnItemClickListener() {
 
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Object o = newDevicesListView.getItemAtPosition(position);
-            String name = (String)o; //As you are using Default String Adapter
-            Log.println(Log.INFO, "DeviceListActivity", "item selected : "+name);
+            BluetoothDevice selected_device = (BluetoothDevice) newDevicesListView.getItemAtPosition(position);
+            String device_name = selected_device.getName(); //
+            Log.println(Log.INFO, "DeviceListActivity", "item selected : "+device_name);
+            selected_device
         }
     };
 
@@ -96,12 +103,10 @@ public class DeviceListActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // If it's already paired, skip it, because it's been listed already
                 //if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                String deviceName = device.getName();
-                if(deviceName != null){
-                    Log.println(Log.INFO, "DeviceListActivity", "device found : "+deviceName);
+                if(device.getName() != null && !device_adaptater.doesDeviceExist(device)){
 
-                    mDevicesArrayAdapter.add(deviceName);
-                    mDevicesArrayAdapter.notifyDataSetChanged();
+                    device_adaptater.add(device);
+                    //device_adaptater.notifyDataSetChanged();
                 }else{
                     Log.println(Log.INFO, "DeviceListActivity", "device found but null, error has been handle correctly");
 

@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 request = new Request.Builder()
                         .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=10&timestamp=" + timestamp + "&action=back")
                         .build();
+                tb.setText("back");
 
                 client.newCall(request).enqueue(new Callback() {
                     @Override

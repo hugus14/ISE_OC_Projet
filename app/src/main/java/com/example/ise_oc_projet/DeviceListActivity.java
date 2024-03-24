@@ -61,17 +61,16 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private void show_available_device() {
         //mDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_item, R.id.device_name);
-        device_adaptater = new DeviceListAdaptater(this);
+        device_adaptater = new DeviceListAdaptater(this, bluetoothAdapter);
         Log.println(Log.INFO, "DeviceListActivity", "Show_available_device is starting");
 
         newDevicesListView.setAdapter(device_adaptater);
-        newDevicesListView.setOnItemClickListener(itemlistener);
-
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
+        newDevicesListView.setOnItemClickListener(clickOnItem);
 
         // Start discovery
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_DENIED) {
@@ -79,18 +78,33 @@ public class DeviceListActivity extends AppCompatActivity {
             return;
         }
 
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        for(BluetoothDevice bt : pairedDevices)
+            device_adaptater.add(bt);
+
         bluetoothAdapter.startDiscovery();
     }
 
-    private final AdapterView.OnItemClickListener itemlistener = new AdapterView.OnItemClickListener() {
+    AdapterView.OnItemClickListener clickOnItem = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+            Toast.makeText(DeviceListActivity.this, "connecting to device...", Toast.LENGTH_LONG).show();
+            Object object = device_adaptater.getItem(position);
+            BluetoothDevice clicked_device = (BluetoothDevice) object;
+            Log.println(Log.INFO, "DeviceListActivity", "clicked on device : "+clicked_device.getName());
 
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            BluetoothDevice selected_device = (BluetoothDevice) newDevicesListView.getItemAtPosition(position);
-            String device_name = selected_device.getName(); //
-            Log.println(Log.INFO, "DeviceListActivity", "item selected : "+device_name);
-            selected_device
+            ConnectThread BT_connexion = new ConnectThread(DeviceListActivity.this, bluetoothAdapter,clicked_device);
+            BT_connexion.start();
         }
     };
+
+    public void showToast(){
+        Toast.makeText(DeviceListActivity.this, "not working", Toast.LENGTH_LONG).show();
+
+    }
+
+
+
 
     // The BroadcastReceiver that listens for discovered devices
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -102,17 +116,18 @@ public class DeviceListActivity extends AppCompatActivity {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // If it's already paired, skip it, because it's been listed already
-                //if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                if(device.getName() != null && !device_adaptater.doesDeviceExist(device)){
-
-                    device_adaptater.add(device);
-                    //device_adaptater.notifyDataSetChanged();
+                if(device != null){
+                    Log.d("DeviceListActivity", "device is null");
                 }else{
-                    Log.println(Log.INFO, "DeviceListActivity", "device found but null, error has been handle correctly");
+                    if(device.getName() != null && !device_adaptater.doesDeviceExist(device)){
 
+                        device_adaptater.add(device);
+                        //device_adaptater.notifyDataSetChanged();
+                    }else{
+                        Log.println(Log.INFO, "DeviceListActivity", "device found but null, error has been handle correctly");
+
+                    }
                 }
-
-               // }
             }
         }
     };
@@ -134,16 +149,16 @@ public class DeviceListActivity extends AppCompatActivity {
         }
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+       // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(DeviceListActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, RSLT_CODE_ACCESS_FINE_LOCATION);
             }
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(DeviceListActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, RSLT_CODE_ACCESS_FINE_LOCATION);
             }
-        }else {
+       // }else {
             Log.println(Log.INFO, "DeviceListActivity", "current build version ("+Build.VERSION.SDK_INT+") is < VERSION_CODES.S ");
-        }
+        //}
 
         check_permission_log();
 

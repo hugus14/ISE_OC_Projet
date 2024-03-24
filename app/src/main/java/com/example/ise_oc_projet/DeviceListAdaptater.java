@@ -1,6 +1,7 @@
 package com.example.ise_oc_projet;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -22,7 +23,9 @@ import java.util.ArrayList;
 public class DeviceListAdaptater extends ArrayAdapter<BluetoothDevice> implements View.OnClickListener {
 
     private ArrayList<BluetoothDevice> deviceSet;
+    private BluetoothAdapter mBtAdapter;
     Context mContext;
+    private final String TAG = "DeviceListAdaptater";
 
     // View lookup cache
     private static class ViewHolder {
@@ -30,16 +33,12 @@ public class DeviceListAdaptater extends ArrayAdapter<BluetoothDevice> implement
         TextView device_name_TV;
     }
 
-    public DeviceListAdaptater(ArrayList<BluetoothDevice> data, Context context) {
-        super(context, R.layout.device_item, data);
-        this.deviceSet = data;
-        this.mContext = context;
-    }
-
-    public DeviceListAdaptater(Context context) {
+    public DeviceListAdaptater(Context context, BluetoothAdapter mBtAdapter) {
         super(context, R.layout.device_item);
         this.deviceSet = new ArrayList<>();
         this.mContext = context;
+        this.mBtAdapter = mBtAdapter;
+
     }
 
     public boolean doesDeviceExist(BluetoothDevice device){
@@ -59,10 +58,16 @@ public class DeviceListAdaptater extends ArrayAdapter<BluetoothDevice> implement
 
     @Override
     public void onClick(View v) {
-
+/*
+        Log.println(Log.INFO, TAG, "staring click on item");
         int position = (Integer) v.getTag();
         Object object = getItem(position);
         BluetoothDevice clicked_device = (BluetoothDevice) object;
+
+        ConnectThread BT_connexion = new ConnectThread(mBtAdapter,clicked_device);
+        BT_connexion.start();
+
+ */
 
     }
 

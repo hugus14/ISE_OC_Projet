@@ -36,14 +36,10 @@ public class ConnectThread extends Thread {
 
 
         try {
-            // Get a BluetoothSocket to connect with the given BluetoothDevice.
-            // MY_UUID is the app's UUID string, also used by the server code.
-            //UUID MY_UUID =  device.getUuids()[0].getUuid();
 
             UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
             //Arrays.stream(device.getUuids()).forEach(parcelUuid -> Log.d(TAG, String.valueOf(parcelUuid)));
             tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-
         } catch (IOException e) {
             Log.e(TAG, "Socket's create() method failed", e);
         }
@@ -54,7 +50,6 @@ public class ConnectThread extends Thread {
     public void run(){
         // Cancel discovery because it otherwise slows down the connection.
         mmBTAdaptater.cancelDiscovery();
-
 
         try {
             mmSocket.connect();
@@ -70,32 +65,11 @@ public class ConnectThread extends Thread {
             return;
         }
         myActivity.runOnUiThread(() -> Toast.makeText(myActivity, "Device Connected", Toast.LENGTH_SHORT).show());
+        Singleton_BT_interface.set(mmSocket);
         // The connection attempt succeeded. Perform work associated with
         // the connection in a separate thread.
-        manageMyConnectedSocket("forward");
     }
 
-    private void manageMyConnectedSocket(String command) {
-        // Get the input and output streams; using temp objects because
-        // member streams are final.
-        InputStream tmpIn = null;
-        OutputStream tmpOut = null;
-        Log.d(TAG, "Sending command:"+command+" to socket");
-
-        try {
-            tmpOut = mmSocket.getOutputStream();
-        } catch (IOException e) {
-            Log.e(TAG, "Error occurred when creating output stream", e);
-        }
-
-        byte[] bytes = command.getBytes();
-        try {
-            assert tmpOut != null;
-            tmpOut.write(bytes);
-        } catch (IOException e) {
-            Log.e(TAG, "Error occurred when sending data", e);
-        }
-    }
 
     // Closes the client socket and causes the thread to finish.
     public void cancel() {

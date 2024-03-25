@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">ISE_OC_Projet</string>
-    <string name="none_paired">Connexion impossible</string>
-    <string name="title_paired_devices">Liste des appareils Bluetooth disponibles</string>
+    <string name="none_paired">Connection failed</string>
+    <string name="title_paired_devices">List of available devices</string>
 </resources>

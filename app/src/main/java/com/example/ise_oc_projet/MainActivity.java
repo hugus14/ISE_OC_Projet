@@ -1,5 +1,7 @@
 package com.example.ise_oc_projet;
 
+import static com.example.ise_oc_projet.StateSocket.*;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -58,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
         Intent bluetoothActivity = new Intent(MainActivity.this,DeviceListActivity.class);
         startActivity(bluetoothActivity);
 
-        //Use Singleton_BT_interface to send and control BT connection socket.
-            //StateSocket rslt = Singleton_BT_interface.send("Forward");
-        //if connection is
 
         SeekBar brightnessSeekBar;
         CheckBox autoBrightnessCheckBox;
@@ -75,12 +74,15 @@ public class MainActivity extends AppCompatActivity {
         left = findViewById(R.id.left);
         right = findViewById(R.id.right);
         forward = findViewById(R.id.forward);
+        bluetooth = findViewById(R.id.btn_bluetooth);
 
         checkAndRequestPermissions();
 
         brightnessSeekBar = findViewById(R.id.brightnessSeekBar);
         autoBrightnessCheckBox = findViewById(R.id.autoBrightnessCheckBox);
 
+
+        // LUMINOSITY
         brightnessSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -107,6 +109,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // BLUETOOTH
+
+        //Use Singleton_BT_interface to send and control BT connection socket.
+
+        bluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StateSocket rslt = Singleton_BT_interface.send("Forward");
+
+                if (rslt == NULL || rslt == DISCONNECTED  || rslt == SENDING_ERROR){
+                    tb.setText("Erreur enzo ton bluethooth marche pas !");
+                }
+            }
+        });
+
+
+
+        // MA PARTIE
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,10 +298,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Singleton_BT_interface.closeConnexion();
         super.onDestroy();
-      
-
     }
-
-
 
 }

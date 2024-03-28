@@ -3,6 +3,7 @@ package com.example.ise_oc_projet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Result
     TextView tb;
+
+    int brightnessLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                brightnessLevel = getScreenBrightness();
                 client = new OkHttpClient();
                 request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=10&timestamp=" + timestamp + "&action=back")
+                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=back")
                         .build();
                 tb.setText("back");
 
@@ -121,9 +125,10 @@ public class MainActivity extends AppCompatActivity {
         forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                brightnessLevel = getScreenBrightness();
                 client = new OkHttpClient();
                 request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=10&timestamp=" + timestamp + "&action=forward")
+                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=forward")
                         .build();
 
                 client.newCall(request).enqueue(new Callback() {
@@ -151,9 +156,10 @@ public class MainActivity extends AppCompatActivity {
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                brightnessLevel = getScreenBrightness();
                 client = new OkHttpClient();
                 request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=10&timestamp=" + timestamp + "&action=left")
+                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=left")
                         .build();
 
                 client.newCall(request).enqueue(new Callback() {
@@ -181,9 +187,10 @@ public class MainActivity extends AppCompatActivity {
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                brightnessLevel = getScreenBrightness();
                 client = new OkHttpClient();
                 request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=10&timestamp=" + timestamp + "&action=right")
+                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=right")
                         .build();
 
                 client.newCall(request).enqueue(new Callback() {
@@ -235,6 +242,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 200);
             }
         }
+    }
+
+    private int getScreenBrightness() {
+        int brightness = 0;
+        ContentResolver contentResolver = getContentResolver();
+        try {
+            // Récupérer le niveau de luminosité actuel depuis les paramètres système
+            brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        return brightness;
     }
 
 

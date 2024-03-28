@@ -99,4 +99,16 @@
         app:layout_constraintTop_toBottomOf="@+id/brightnessSeekBar"
         app:layout_constraintVertical_bias="0.0" />
 
+    <Button
+        android:id="@+id/btn_bluetooth"
+        android:layout_width="75dp"
+        android:layout_height="77dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.741"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.706" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

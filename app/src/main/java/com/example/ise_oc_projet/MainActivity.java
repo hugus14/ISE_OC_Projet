@@ -1,7 +1,5 @@
 package com.example.ise_oc_projet;
 
-import static com.example.ise_oc_projet.StateSocket.*;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -23,14 +21,10 @@ import java.io.IOException;
 
 import okhttp3.*;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements CallBackMain {
 
 
     //*** VARIABLES ***//
-    // WEB
-    OkHttpClient client;
-    Request request;
-
     // Timestamp
     long timestamp;
     String timestampString;
@@ -48,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     int brightnessLevel;
 
+    ApiWeb apiWeb;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -57,9 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         //To Connect to bluetooth device, start bluetoothActivity
-        Intent bluetoothActivity = new Intent(MainActivity.this,DeviceListActivity.class);
-        startActivity(bluetoothActivity);
 
+
+        //Use Singleton_BT_interface to send and control BT connection socket.
+        // = Singleton_BT_interface.send("Forward");
+        //if connection is
 
         SeekBar brightnessSeekBar;
         CheckBox autoBrightnessCheckBox;
@@ -78,11 +76,19 @@ public class MainActivity extends AppCompatActivity {
 
         checkAndRequestPermissions();
 
+
         brightnessSeekBar = findViewById(R.id.brightnessSeekBar);
         autoBrightnessCheckBox = findViewById(R.id.autoBrightnessCheckBox);
 
 
-        // LUMINOSITY
+        bluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent bluetoothActivity = new Intent(MainActivity.this,DeviceListActivity.class);
+                startActivity(bluetoothActivity);
+            }
+        });
+
         brightnessSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -109,52 +115,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // BLUETOOTH
-
-        //Use Singleton_BT_interface to send and control BT connection socket.
-
-        bluetooth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StateSocket rslt = Singleton_BT_interface.send("Forward");
-
-                if (rslt == NULL || rslt == DISCONNECTED  || rslt == SENDING_ERROR){
-                    tb.setText("Erreur enzo ton bluethooth marche pas !");
-                }
-            }
-        });
-
-
-
-        // MA PARTIE
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 brightnessLevel = getScreenBrightness();
-                client = new OkHttpClient();
-                request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=back")
-                        .build();
-                tb.setText("back");
-
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        final String webContent = response.body().string();
-                        if(!response.isSuccessful()){
-                            Log.e("Projet gp 56", "Erreur : " + response);
-                            throw new IOException("Erreur : " + response);
-                        } else {
-                            Log.d("Projet gp 56", webContent);
-                            MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
-                        }
-                    }
-                });
+                apiWeb = new ApiWeb("back", brightnessLevel);
+                apiWeb.requetAPI(MainActivity.this);
 
             }
         });
@@ -163,29 +129,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 brightnessLevel = getScreenBrightness();
-                client = new OkHttpClient();
-                request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=forward")
-                        .build();
-
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        final String webContent = response.body().string();
-                        if(!response.isSuccessful()){
-                            Log.e("Projet gp 56", "Erreur : " + response);
-                            throw new IOException("Erreur : " + response);
-                        } else {
-                            Log.d("Projet gp 56", webContent);
-                            MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
-                        }
-                    }
-                });
+                apiWeb = new ApiWeb("forward", brightnessLevel);
+                apiWeb.requetAPI(MainActivity.this);
 
             }
         });
@@ -194,29 +139,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 brightnessLevel = getScreenBrightness();
-                client = new OkHttpClient();
-                request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=left")
-                        .build();
-
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        final String webContent = response.body().string();
-                        if(!response.isSuccessful()){
-                            Log.e("Projet gp 56", "Erreur : " + response);
-                            throw new IOException("Erreur : " + response);
-                        } else {
-                            Log.d("Projet gp 56", webContent);
-                            MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
-                        }
-                    }
-                });
+                brightnessLevel = getScreenBrightness();
+                apiWeb = new ApiWeb("left", brightnessLevel);
+                apiWeb.requetAPI(MainActivity.this);
 
             }
         });
@@ -225,29 +150,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 brightnessLevel = getScreenBrightness();
-                client = new OkHttpClient();
-                request = new Request.Builder()
-                        .url("http://cabani.free.fr/ise/adddata.php?idproject=56&lux=" + brightnessLevel + "&timestamp=" + timestamp + "&action=right")
-                        .build();
-
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        final String webContent = response.body().string();
-                        if(!response.isSuccessful()){
-                            Log.e("Projet gp 56", "Erreur : " + response);
-                            throw new IOException("Erreur : " + response);
-                        } else {
-                            Log.d("Projet gp 56", webContent);
-                            MainActivity.this.runOnUiThread(()->(tb).setText(webContent));
-                        }
-                    }
-                });
+                brightnessLevel = getScreenBrightness();
+                apiWeb = new ApiWeb("right", brightnessLevel);
+                apiWeb.requetAPI(MainActivity.this);
 
             }
         });
@@ -298,6 +203,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Singleton_BT_interface.closeConnexion();
         super.onDestroy();
+
+
     }
 
+
+    @Override
+    public void notifyApiWebEnded(String webContent) {
+        runOnUiThread(()->(tb).setText(webContent));
+
+    }
 }

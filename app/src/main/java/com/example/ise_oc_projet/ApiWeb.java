@@ -12,6 +12,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * this class allows connection to the web api to
+ * send user actions via the screen
+ *
+ * @author LEVEEL LE MOUELLIC LEVILLAIN
+ */
 public class ApiWeb {
 
     //*** VARIABLES ***//
@@ -28,6 +34,11 @@ public class ApiWeb {
     int luminosity;
 
 
+    /**
+     * Init the value for send to the APIWeb
+     * @param action : action send by the user
+     * @param luminosity : the luminosity of the screen
+     */
     public ApiWeb(String action, int luminosity){
 
         // To get the timestamp in mS
@@ -38,6 +49,10 @@ public class ApiWeb {
 
     }
 
+    /**
+     * To send the action and luminosty to the API
+     * @param toCall
+     */
     public void requetAPI(CallBackMain toCall){
 
         client = new OkHttpClient();
@@ -55,7 +70,7 @@ public class ApiWeb {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 final String webContent = response.body().string();
                 if (!response.isSuccessful()) {
-                    Log.e("Projet gp 56", "Erreur : " + response);
+                    Log.e("APIWeb.java connection to the api", "Erreur : " + response);
                     throw new IOException("Erreur : " + response);
 
                 } else {

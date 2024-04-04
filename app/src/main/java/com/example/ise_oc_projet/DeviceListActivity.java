@@ -1,12 +1,14 @@
 package com.example.ise_oc_projet;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -236,6 +238,7 @@ public class DeviceListActivity extends AppCompatActivity {
         return true;
     }
 
+
     private void setConnectedIcon(){
         IMV_BT_status.setImageResource(R.drawable.bt_connected);
     }
@@ -281,6 +284,7 @@ public class DeviceListActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == ACTIVITY_RESULT_BT_ENABLE) {
+            Log.d("onActivityResult", "set on activity result call for BT ");
             show_available_device();
         } else if (resultCode == RSLT_CODE_ACCESS_FINE_LOCATION) {
             check_permission_log();

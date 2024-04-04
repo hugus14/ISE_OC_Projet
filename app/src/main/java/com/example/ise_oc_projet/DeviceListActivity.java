@@ -88,6 +88,9 @@ public class DeviceListActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * add available bluetooth device to the listview.
+     */
     private void show_available_device() {
         //mDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_item, R.id.device_name);
         device_adaptater = new DeviceListAdaptater(this, bluetoothAdapter);
@@ -185,12 +188,17 @@ public class DeviceListActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * sart searching for bluetooth device and set icon on screen.
+     */
     private void startSearching(){
         bluetoothAdapter.startDiscovery();
         setSearchingIcon();
     }
 
-
+    /**
+     * ceck for permsission and ask if required
+     */
     private void init() {
         bluetoothManager = getSystemService(BluetoothManager.class);
         bluetoothAdapter = bluetoothManager.getAdapter();
@@ -221,6 +229,9 @@ public class DeviceListActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Show recap log of bluetooth permission
+     */
     private void check_permission_log() {
         Log.println(Log.INFO, "DeviceListActivity", "ACCESS_BACKGROUND_LOCATION is " + ((ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) ? "granted" : "denied"));
         Log.println(Log.INFO, "DeviceListActivity", "BLUETOOTH_SCAN is " + ((ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) ? "granted" : "denied"));
@@ -229,6 +240,10 @@ public class DeviceListActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Check if bluetooth is set, else ask for turning on bluetooth.
+     * @return true if already enable.
+     */
     private boolean ask_for_BT() {
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -239,19 +254,38 @@ public class DeviceListActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Set BT connected icon on screen
+     */
     private void setConnectedIcon(){
         IMV_BT_status.setImageResource(R.drawable.bt_connected);
     }
+
+    /**
+     * Set BT Searching icon on screen
+     */
     private void setSearchingIcon(){
         IMV_BT_status.setImageResource(R.drawable.bt_searching);
     }
+
+    /**
+     * Set BT Disable icon on screen
+     */
     private void setDisabledIcon(){
         IMV_BT_status.setImageResource(R.drawable.bt_disable);
     }
+
+    /**
+     * Set BT Error icon on screen
+     */
     private void setErrorIcon(){
         IMV_BT_status.setImageResource(R.drawable.error);
     }
 
+    /**
+     * AlertDialog to show when user ask for quitting when socket is not set.
+     * @return AlertDialog to show.
+     */
     private AlertDialog create_NoConnectDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
@@ -265,6 +299,11 @@ public class DeviceListActivity extends AppCompatActivity {
         });
        return  builder.create();
     }
+
+    /**
+     * AlertDialog to show when user ask for quitting when socket is set.
+     * @return AlertDialog to show.
+     */
     private AlertDialog create_NormalExitDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);

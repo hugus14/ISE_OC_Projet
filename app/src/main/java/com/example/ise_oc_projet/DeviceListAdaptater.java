@@ -20,6 +20,10 @@ import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
 
+/**
+ * @author Enzo LEVILLAIN
+ * Adapter for listView
+ */
 public class DeviceListAdaptater extends ArrayAdapter<BluetoothDevice> implements View.OnClickListener {
 
     private ArrayList<BluetoothDevice> deviceSet;
@@ -33,6 +37,11 @@ public class DeviceListAdaptater extends ArrayAdapter<BluetoothDevice> implement
         TextView device_name_TV;
     }
 
+    /**
+     * Create a DeviceListAdaptater
+     * @param context application context
+     * @param mBtAdapter bluetoothmanager to use for connection
+     */
     public DeviceListAdaptater(Context context, BluetoothAdapter mBtAdapter) {
         super(context, R.layout.device_item);
         this.deviceSet = new ArrayList<>();
@@ -41,6 +50,11 @@ public class DeviceListAdaptater extends ArrayAdapter<BluetoothDevice> implement
 
     }
 
+    /**
+     * Check if given Device exist on current list of device
+     * @param device given device
+     * @return true if exist in list
+     */
     public boolean doesDeviceExist(BluetoothDevice device){
         Object find = deviceSet.stream()
                 .filter(seenDevice -> seenDevice.getAddress().equals(device.getAddress()))
